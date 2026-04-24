@@ -4,3 +4,4 @@ scikit-learn==1.5.1
 matplotlib==3.9.2
 numpy==1.26.4
 Werkzeug==3.0.3
+gunicorn==22.0.0 
