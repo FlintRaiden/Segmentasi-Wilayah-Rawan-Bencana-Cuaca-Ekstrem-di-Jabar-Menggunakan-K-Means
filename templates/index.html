@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}Beranda – Analisis Klasterisasi Bencana Cuaca Ekstrem Jawa Barat{% endblock %}
+
+{% block content %}
+
+<!-- HERO SECTION -->
+<section class="hero-section">
+    <div class="hero-bg-pattern"></div>
+    <div class="container">
+        <div class="row align-items-center min-vh-hero">
+            <div class="col-lg-7">
+                <div class="hero-badge mb-3">
+                    <i class="bi bi-shield-check me-2"></i>Sistem Analitik Kebencanaan
+                </div>
+                <h1 class="hero-title">
+                    Analisis Klasterisasi<br>
+                    <span class="hero-title-accent">Wilayah Rawan Bencana</span><br>
+                    Cuaca Ekstrem Jawa Barat
+                </h1>
+                <p class="hero-desc mt-3">
+                    Menggunakan algoritma <strong>K-Means Clustering</strong> dengan metode
+                    <strong>Elbow</strong> dan <strong>Silhouette Score</strong> untuk mengelompokkan
+                    kabupaten/kota berdasarkan tingkat kerawanan bencana cuaca ekstrem.
+                </p>
+                <div class="d-flex gap-3 flex-wrap mt-4">
+                    <a href="#upload" class="btn btn-hero-primary">
+                        <i class="bi bi-upload me-2"></i>Mulai Analisis
+                    </a>
+                    <a href="#tentang" class="btn btn-hero-outline">
+                        <i class="bi bi-book me-2"></i>Pelajari Metode
+                    </a>
+                </div>
+                <div class="hero-stats mt-5">
+                    <div class="stat-pill"><i class="bi bi-map me-2"></i>27 Kab/Kota</div>
+                    <div class="stat-pill"><i class="bi bi-calendar me-2"></i>2012–2025</div>
+                    <div class="stat-pill"><i class="bi bi-cpu me-2"></i>K-Means AI</div>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-flex justify-content-center">
+                <div class="hero-illustration">
+                    <div class="hero-map-card">
+                        <div class="map-card-inner">
+                            <i class="bi bi-map text-success" style="font-size:4rem;opacity:.15;position:absolute;top:10px;right:15px;"></i>
+                            <div class="cluster-dot-group">
+                                <span class="cdot cdot-1"></span>
+                                <span class="cdot cdot-2"></span>
+                                <span class="cdot cdot-3"></span>
+                                <span class="cdot cdot-4"></span>
+                                <span class="cdot cdot-5"></span>
+                            </div>
+                            <div class="mini-chart-bars">
+                                <div class="mbar" style="height:40%;background:#2ecc71"></div>
+                                <div class="mbar" style="height:65%;background:#3498db"></div>
+                                <div class="mbar" style="height:90%;background:#e74c3c"></div>
+                                <div class="mbar" style="height:55%;background:#f39c12"></div>
+                                <div class="mbar" style="height:75%;background:#1a6e3c"></div>
+                                <div class="mbar" style="height:45%;background:#2ecc71"></div>
+                                <div class="mbar" style="height:80%;background:#3498db"></div>
+                            </div>
+                            <div class="map-card-label">Peta Distribusi Klaster</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURE CARDS -->
+<section class="features-section py-5">
+    <div class="container">
+        <div class="row gy-4">
+            <div class="col-md-4">
+                <div class="feature-card h-100">
+                    <div class="feature-icon-wrap bg-success-soft">
+                        <i class="bi bi-gear-wide-connected text-success"></i>
+                    </div>
+                    <h5 class="feature-title">Pemrosesan Otomatis</h5>
+                    <p class="feature-desc">Pembersihan data duplikat, normalisasi MinMax, dan penentuan jumlah klaster optimal dilakukan secara otomatis.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card h-100">
+                    <div class="feature-icon-wrap bg-primary-soft">
+                        <i class="bi bi-graph-up text-primary"></i>
+                    </div>
+                    <h5 class="feature-title">Visualisasi Lengkap</h5>
+                    <p class="feature-desc">Grafik Elbow Method, Silhouette Score, Scatter Plot, dan Bar Chart distribusi klaster disajikan secara interaktif.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card h-100">
+                    <div class="feature-icon-wrap bg-warning-soft">
+                        <i class="bi bi-table text-warning"></i>
+                    </div>
+                    <h5 class="feature-title">Tabel Klasifikasi</h5>
+                    <p class="feature-desc">Hasil klasterisasi ditampilkan dalam tabel terstruktur dengan tingkatan kerawanan dari Sangat Rendah hingga Sangat Tinggi.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- UPLOAD SECTION -->
+<section class="upload-section py-5" id="upload">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="section-header text-center mb-5">
+                    <div class="section-badge">
+                        <i class="bi bi-cloud-upload me-2"></i>Unggah Dataset
+                    </div>
+                    <h2 class="section-title">Unggah Data CSV Kejadian Bencana</h2>
+                    <p class="section-desc">Gunakan dataset CSV dari BPBD Jawa Barat yang memiliki kolom <code>nama_kabupaten_kota</code>, <code>jumlah_cuaca_ekstrem</code>, dan <code>tahun</code>.</p>
+                </div>
+
+                <div class="upload-card">
+                    <form action="{{ url_for('analyze') }}" method="post" enctype="multipart/form-data" id="uploadForm">
+                        <!-- Drop Zone -->
+                        <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                            <input type="file" name="file" id="fileInput" accept=".csv" class="d-none" required>
+                            <div class="dz-icon">
+                                <i class="bi bi-file-earmark-spreadsheet"></i>
+                            </div>
+                            <div class="dz-main-text">Klik atau seret file CSV ke sini</div>
+                            <div class="dz-sub-text">Format: <strong>.csv</strong> · Maks: <strong>16 MB</strong></div>
+                            <div class="dz-selected d-none" id="dzSelected">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <span id="dzFileName">—</span>
+                            </div>
+                        </div>
+
+                        <!-- Options -->
+                        <div class="mt-4 p-4 options-panel">
+                            <h6 class="options-title mb-3">
+                                <i class="bi bi-sliders me-2"></i>Opsi Klasterisasi
+                            </h6>
+                            <div class="row align-items-center gy-3">
+                                <div class="col-md-7">
+                                    <label class="form-label fw-semibold">Jumlah Klaster (K)</label>
+                                    <p class="text-muted small mb-2">Kosongkan untuk penentuan otomatis via Elbow &amp; Silhouette</p>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <input type="number" name="n_clusters" id="nClusters"
+                                               class="form-control k-input" min="2" max="8" placeholder="Auto">
+                                        <span class="text-muted small">(2–8)</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="auto-badge-box">
+                                        <i class="bi bi-cpu-fill me-2 text-success"></i>
+                                        <div>
+                                            <div class="fw-semibold small">Mode Otomatis</div>
+                                            <div class="text-muted" style="font-size:.75rem">Algoritma menentukan K optimal</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="mt-4 text-center">
+                            <button type="submit" class="btn btn-analyze" id="submitBtn">
+                                <span class="btn-analyze-inner">
+                                    <i class="bi bi-play-circle-fill me-2"></i>Jalankan Analisis K-Means
+                                </span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Dataset format hint -->
+                <div class="dataset-hint mt-4">
+                    <h6 class="hint-title"><i class="bi bi-info-circle me-2"></i>Format Dataset yang Didukung</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm hint-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>nama_kabupaten_kota</th>
+                                    <th>jumlah_cuaca_ekstrem</th>
+                                    <th>tahun</th>
+                                    <th>…kolom lain</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Kabupaten Bogor</td><td>45</td><td>2020</td><td>opsional</td></tr>
+                                <tr><td>Kota Bandung</td><td>12</td><td>2021</td><td>opsional</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TENTANG / METODOLOGI -->
+<section class="method-section py-5 bg-light-green" id="tentang">
+    <div class="container">
+        <div class="section-header text-center mb-5">
+            <div class="section-badge"><i class="bi bi-book me-2"></i>Metodologi</div>
+            <h2 class="section-title">Pendekatan Ilmiah K-Means Clustering</h2>
+        </div>
+        <div class="row gy-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="method-step">
+                    <div class="step-num">01</div>
+                    <h6 class="step-title">Pra-pemrosesan Data</h6>
+                    <p class="step-desc">Penghapusan duplikat, penanganan nilai hilang, dan normalisasi MinMax agar setiap fitur memiliki rentang [0, 1].</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="method-step">
+                    <div class="step-num">02</div>
+                    <h6 class="step-title">Elbow Method</h6>
+                    <p class="step-desc">Menghitung inertia untuk K = 2–8, lalu mencari titik "siku" menggunakan turunan kedua dari kurva inertia.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="method-step">
+                    <div class="step-num">03</div>
+                    <h6 class="step-title">Silhouette Score</h6>
+                    <p class="step-desc">Mengukur seberapa mirip objek dengan klasternya sendiri dibanding klaster lain. Skor mendekati 1 menunjukkan klaster yang baik.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="method-step">
+                    <div class="step-num">04</div>
+                    <h6 class="step-title">Klasifikasi Wilayah</h6>
+                    <p class="step-desc">Klaster diurutkan berdasarkan rata-rata kejadian dan diberi label Sangat Rendah hingga Sangat Tinggi secara proporsional.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const dzSelected = document.getElementById('dzSelected');
+const dzFileName = document.getElementById('dzFileName');
+const submitBtn = document.getElementById('submitBtn');
+const uploadForm = document.getElementById('uploadForm');
+
+fileInput.addEventListener('change', function() {
+    if (this.files[0]) showFile(this.files[0]);
+});
+
+['dragover','dragenter'].forEach(evt => {
+    dropZone.addEventListener(evt, e => {
+        e.preventDefault();
+        dropZone.classList.add('dz-hover');
+    });
+});
+
+['dragleave','drop'].forEach(evt => {
+    dropZone.addEventListener(evt, e => {
+        e.preventDefault();
+        dropZone.classList.remove('dz-hover');
+    });
+});
+
+dropZone.addEventListener('drop', e => {
+    const f = e.dataTransfer.files[0];
+    if (f && f.name.endsWith('.csv')) {
+        fileInput.files = e.dataTransfer.files;
+        showFile(f);
+    }
+});
+
+function showFile(f) {
+    dzSelected.classList.remove('d-none');
+    dzFileName.textContent = f.name + ' (' + (f.size / 1024).toFixed(1) + ' KB)';
+    dropZone.classList.add('dz-has-file');
+}
+
+uploadForm.addEventListener('submit', function() {
+    submitBtn.innerHTML = `<span class="btn-analyze-inner">
+        <span class="spinner-border spinner-border-sm me-2"></span>Memproses…
+    </span>`;
+    submitBtn.disabled = true;
+});
+</script>
+{% endblock %}

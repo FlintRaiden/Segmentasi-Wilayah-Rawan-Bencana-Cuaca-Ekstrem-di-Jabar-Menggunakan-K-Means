@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block title %}Hasil Analisis – K={{ optimal_k }} – SiKlaster Jabar{% endblock %}
+
+{% block content %}
+
+<!-- RESULTS HEADER -->
+<section class="results-hero py-4">
+    <div class="container">
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+            <a href="{{ url_for('index') }}" class="btn btn-outline-light btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>Kembali
+            </a>
+            <div class="results-breadcrumb">
+                <span class="text-white-50">Beranda</span>
+                <i class="bi bi-chevron-right mx-2 text-white-50"></i>
+                <span class="text-white fw-semibold">Hasil Analisis</span>
+            </div>
+        </div>
+        <div class="row mt-4 align-items-end">
+            <div class="col-lg-8">
+                <h1 class="results-hero-title">
+                    Hasil Klasterisasi K-Means
+                </h1>
+                <p class="results-hero-sub mb-0">
+                    Dataset: <strong>{{ filename }}</strong> ·
+                    K Optimal = <strong>{{ optimal_k }} Klaster</strong> ·
+                    Silhouette = <strong>{{ final_silhouette }}</strong>
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <div class="sil-badge-large {% if final_silhouette >= 0.5 %}sil-good{% elif final_silhouette >= 0.3 %}sil-fair{% else %}sil-poor{% endif %}">
+                    <div class="sil-label">Silhouette Score</div>
+                    <div class="sil-val">{{ final_silhouette }}</div>
+                    <div class="sil-desc">
+                        {% if final_silhouette >= 0.5 %}Klaster Kuat
+                        {% elif final_silhouette >= 0.3 %}Klaster Sedang
+                        {% else %}Klaster Lemah{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SUMMARY STATS -->
+<section class="py-4 bg-light-green">
+    <div class="container">
+        <div class="row gy-3 gx-3">
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-card-icon"><i class="bi bi-file-earmark-text text-success"></i></div>
+                    <div class="stat-card-val">{{ n_rows }}</div>
+                    <div class="stat-card-label">Baris Data Bersih</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-card-icon"><i class="bi bi-geo-alt text-primary"></i></div>
+                    <div class="stat-card-val">{{ n_regions }}</div>
+                    <div class="stat-card-label">Kab/Kota Dianalisis</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-card-icon"><i class="bi bi-layers text-warning"></i></div>
+                    <div class="stat-card-val">{{ optimal_k }}</div>
+                    <div class="stat-card-label">Klaster Optimal</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-card-icon"><i class="bi bi-calendar-range text-danger"></i></div>
+                    <div class="stat-card-val" style="font-size:1.1rem">{{ year_range }}</div>
+                    <div class="stat-card-label">Periode Data</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cleaning info -->
+        <div class="cleaning-banner mt-3">
+            <i class="bi bi-funnel-fill me-2 text-success"></i>
+            <strong>Pembersihan Data:</strong>
+            <span class="ms-2">{{ n_dupes }} baris duplikat dihapus</span>
+            <span class="mx-2 text-muted">·</span>
+            <span>{{ n_missing }} baris tidak lengkap dihapus</span>
+            <span class="mx-2 text-muted">·</span>
+            <span>Normalisasi MinMax diterapkan pada 4 fitur</span>
+            <span class="mx-2 text-muted">·</span>
+            <span>{{ k_source }}</span>
+        </div>
+    </div>
+</section>
+
+<!-- CLUSTER SUMMARY PILLS -->
+<section class="py-4">
+    <div class="container">
+        <h5 class="section-sub-title mb-3"><i class="bi bi-layers me-2"></i>Ringkasan Klaster</h5>
+        <div class="row gy-3">
+            {% for cs in cluster_summary %}
+            <div class="col-md-6 col-lg-4">
+                <div class="cluster-summary-card" style="border-left-color: {{ cs.color }}">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="cluster-dot" style="background:{{ cs.color }}"></span>
+                        <span class="fw-bold">Klaster {{ cs.cluster }}</span>
+                        <span class="badge ms-auto" style="background:{{ cs.color }}">{{ cs.label }}</span>
+                    </div>
+                    <div class="text-muted small">{{ cs.count }} wilayah</div>
+                    <div class="cluster-regions-text">{{ cs.regions }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- CHARTS SECTION -->
+<section class="charts-section py-4">
+    <div class="container">
+        <h5 class="section-sub-title mb-4"><i class="bi bi-graph-up me-2"></i>Visualisasi Analisis</h5>
+        <div class="row gy-4">
+            <!-- Elbow -->
+            <div class="col-lg-6">
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <span class="chart-card-title"><i class="bi bi-bezier me-2"></i>Elbow Method</span>
+                        <span class="chart-badge badge bg-success">K optimal = {{ optimal_k }}</span>
+                    </div>
+                    <div class="chart-body">
+                        <img src="data:image/png;base64,{{ img_elbow }}" class="img-fluid rounded" alt="Elbow Method">
+                    </div>
+                    <div class="chart-desc">
+                        Grafik menunjukkan hubungan antara jumlah klaster (K) dan nilai inertia. Titik siku menunjukkan K optimal di mana penambahan klaster sudah tidak signifikan menurunkan inertia.
+                    </div>
+                </div>
+            </div>
+            <!-- Silhouette -->
+            <div class="col-lg-6">
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <span class="chart-card-title"><i class="bi bi-bar-chart me-2"></i>Silhouette Score</span>
+                        <span class="chart-badge badge bg-primary">Skor = {{ final_silhouette }}</span>
+                    </div>
+                    <div class="chart-body">
+                        <img src="data:image/png;base64,{{ img_silhouette }}" class="img-fluid rounded" alt="Silhouette Score">
+                    </div>
+                    <div class="chart-desc">
+                        Silhouette Score mengukur kualitas klasterisasi. Batang tertinggi menunjukkan nilai K yang menghasilkan pemisahan klaster paling optimal.
+                    </div>
+                </div>
+            </div>
+            <!-- Bar Chart -->
+            <div class="col-12">
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <span class="chart-card-title"><i class="bi bi-bar-chart-horizontal me-2"></i>Distribusi Total Kejadian per Wilayah</span>
+                    </div>
+                    <div class="chart-body">
+                        <img src="data:image/png;base64,{{ img_bar }}" class="img-fluid rounded" alt="Bar Chart Klaster">
+                    </div>
+                </div>
+            </div>
+            <!-- Scatter Plot -->
+            <div class="col-12">
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <span class="chart-card-title"><i class="bi bi-scatter-chart me-2"></i>Scatter Plot Hasil Klasterisasi</span>
+                    </div>
+                    <div class="chart-body">
+                        <img src="data:image/png;base64,{{ img_scatter }}" class="img-fluid rounded" alt="Scatter Plot K-Means">
+                    </div>
+                    <div class="chart-desc">
+                        Setiap titik merepresentasikan satu kabupaten/kota. Sumbu X = rata-rata kejadian per tahun, Sumbu Y = nilai kejadian maksimum dalam satu tahun.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CLASSIFICATION TABLE -->
+<section class="table-section py-4 mb-4">
+    <div class="container">
+        <div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+            <h5 class="section-sub-title mb-0"><i class="bi bi-table me-2"></i>Tabel Klasifikasi Wilayah</h5>
+            <div class="ms-auto d-flex gap-2 flex-wrap">
+                <input type="text" id="tableSearch" class="form-control form-control-sm table-search" placeholder="Cari kabupaten/kota…" style="width:220px">
+            </div>
+        </div>
+        <div class="table-responsive results-table-wrap">
+            <table class="table table-hover results-table" id="resultsTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Kabupaten / Kota</th>
+                        <th>Total Kejadian</th>
+                        <th>Rata-rata / Thn</th>
+                        <th>Maks. Kejadian</th>
+                        <th>Std. Deviasi</th>
+                        <th>Klaster</th>
+                        <th>Tingkat Kerawanan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in table_data %}
+                    <tr>
+                        <td class="text-muted">{{ loop.index }}</td>
+                        <td class="fw-semibold">{{ row.nama_kabupaten_kota }}</td>
+                        <td>{{ row.total | int }}</td>
+                        <td>{{ "%.1f" | format(row.rata_rata) }}</td>
+                        <td>{{ row.maksimum | int }}</td>
+                        <td>{{ "%.1f" | format(row.std_dev) }}</td>
+                        <td><span class="badge bg-secondary">{{ row.cluster }}</span></td>
+                        <td>
+                            <span class="badge rawan-badge badge-{{ row.badge_class }}">
+                                {{ row.tingkat_kerawanan }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="text-muted small mt-2">
+            <i class="bi bi-info-circle me-1"></i>
+            Tingkat kerawanan ditentukan berdasarkan total kejadian agregat per wilayah dalam seluruh periode data.
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Table search filter
+document.getElementById('tableSearch').addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('#resultsTable tbody tr').forEach(row => {
+        row.style.display = row.cells[1].textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+});
+</script>
+{% endblock %}
