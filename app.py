@@ -21,7 +21,7 @@ from sklearn.metrics import silhouette_score
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'kmeans-jabar-2024-secret')
-app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads') 
+app.config['UPLOAD_FOLDER'] = '/tmp'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB
 
 ALLOWED_EXTENSIONS = {'csv'}
@@ -344,5 +344,4 @@ def too_large(e):
 
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    app.run(debug=False)

@@ -1,0 +1,12 @@
+[project]
+name = "siklaster-jabar"
+version = "0.1.0"
+requires-python = "==3.11.*"
+dependencies = [
+    "flask==3.0.3",
+    "pandas==2.2.2",
+    "scikit-learn==1.5.1",
+    "matplotlib==3.9.2",
+    "numpy==1.26.4",
+    "werkzeug==3.0.3",
+]
